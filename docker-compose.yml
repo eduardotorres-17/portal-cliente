@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # Nosso Banco de Dados
+  postgres:
+    image: postgres:15-alpine
+    container_name: portal_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adminpassword
+      POSTGRES_DB: portal_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Nossa Interface Gráfica para ver o Banco (Opcional, mas muito útil)
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: portal_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@portal.com
+      PGADMIN_DEFAULT_PASSWORD: adminpassword
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
