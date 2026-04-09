@@ -7,18 +7,29 @@ import { Project } from './project.entity';
 import { Milestone } from './milestone.entity';
 import { Comment } from './comment.entity';
 
+// Importe o módulo recém-criado
+import { UsersModule } from './users/users.module';
+import { ProjectsModule } from './projects/projects.module';
+import { MilestonesModule } from './milestones/milestones.module'
+import { CommentsModule } from './comments/comments.module';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost', // ⚠️ Atenção Tech: Usamos localhost porque o NestJS está rodando na sua máquina, fora do Docker!
+      host: 'localhost',
       port: 5433,
       username: 'admin',
       password: 'adminpassword',
       database: 'portal_db',
       entities: [User, Project, Milestone, Comment],
-      synchronize: true, // Magia pura: cria e atualiza as tabelas automaticamente (usar apenas em dev!)
+      synchronize: true,
     }),
+    // Avise o NestJS que o módulo de usuários existe!
+    UsersModule,
+    ProjectsModule,
+    MilestonesModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
