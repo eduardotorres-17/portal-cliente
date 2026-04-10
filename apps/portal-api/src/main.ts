@@ -5,7 +5,8 @@ import { AppModule } from './app/app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+  app.enableCors();
+
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
 
@@ -23,7 +24,7 @@ async function bootstrap() {
     .setDescription('API para gestão de projetos e milestones para freelancers.')
     .setVersion('1.0')
     .build();
-    
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 

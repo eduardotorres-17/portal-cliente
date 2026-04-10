@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { NxWelcome } from './nx-welcome';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
-  imports: [NxWelcome, RouterModule],
-  selector: 'app-root',
-  templateUrl: './app.html',
-  styleUrl: './app.scss',
+  selector: 'portal-web-root',
+  standalone: true,
+  imports: [RouterOutlet],
+  template: `<router-outlet></router-outlet>`,
 })
+// 👇 AQUI ESTAVA AppComponent, VAMOS MUDAR PARA App PARA AGRADAR O main.ts
 export class App {
-  protected title = 'portal-web';
+  title = 'portal-web';
 }

@@ -1,0 +1,78 @@
+<div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl mx-auto">
+
+    <a [routerLink]="linkDeRetorno" class="text-indigo-600 hover:text-indigo-800 font-medium text-sm flex items-center mb-6 transition">
+      ← Voltar para o {{ linkDeRetorno === '/admin' ? 'Dashboard' : 'Portal' }}
+    </a>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+      <h1 class="text-2xl font-bold text-gray-800">Gerenciamento de Etapas</h1>
+      <p class="text-gray-500 text-sm mt-1">ID do Projeto: <span class="font-mono bg-gray-100 px-2 py-1 rounded">{{ projectId }}</span></p>
+    </div>
+
+    <h2 class="text-lg font-bold text-gray-700 mb-4">Etapas do Projeto (Milestones)</h2>
+
+    <div class="space-y-4">
+      <div *ngFor="let milestone of milestones" class="bg-white rounded-lg shadow-sm border border-l-4 border-l-indigo-500 overflow-hidden">
+
+        <div class="p-5 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition" (click)="abrirChat(milestone.id)">
+          <div>
+            <h3 class="text-lg font-bold text-gray-800">{{ milestone.title }}</h3>
+            <p class="text-gray-600 text-sm mt-1">{{ milestone.description }}</p>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span class="inline-block bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">
+              Peso: {{ milestone.weight }}%
+            </span>
+            <svg class="w-5 h-5 text-gray-400 transform transition-transform" [class.rotate-180]="etapaAtivaId === milestone.id" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </div>
+        </div>
+
+        <div *ngIf="etapaAtivaId === milestone.id" class="border-t border-gray-200 bg-gray-50 p-5">
+          <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4">Histórico de Alterações</h4>
+
+          <div class="space-y-3 mb-4 max-h-60 overflow-y-auto pr-2">
+
+            <div *ngFor="let msg of comentariosDaEtapa" class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
+              <div class="flex justify-between items-center mb-1">
+                <span class="font-bold text-sm" [ngClass]="msg.author.role === 'ADMIN' ? 'text-indigo-600' : 'text-emerald-600'">
+                  {{ msg.author.name }} ({{ msg.author.role }})
+                </span>
+                <span class="text-xs text-gray-400">{{ msg.created_at | date:'short' }}</span>
+              </div>
+              <p class="text-gray-700 text-sm">{{ msg.content }}</p>
+            </div>
+
+            <div *ngIf="comentariosDaEtapa.length === 0" class="text-center text-gray-500 text-sm py-4">
+              Nenhum comentário nesta etapa ainda.
+            </div>
+          </div>
+
+          <div class="flex space-x-2 mt-4 pt-4 border-t border-gray-200">
+            <input
+              type="text"
+              [(ngModel)]="novaMensagem"
+              (keyup.enter)="enviarMensagem()"
+              placeholder="Digite sua mensagem..."
+              class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+
+            <button
+              (click)="enviarMensagem()"
+              class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition flex items-center">
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+              Enviar
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div *ngIf="milestones.length === 0" class="text-center py-10 bg-white rounded-lg border border-dashed border-gray-300">
+        <p class="text-gray-500">Nenhuma etapa cadastrada neste projeto ainda.</p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
