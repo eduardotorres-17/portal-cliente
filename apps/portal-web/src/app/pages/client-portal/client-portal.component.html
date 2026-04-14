@@ -1,17 +1,23 @@
 <div class="min-h-screen bg-slate-50 font-sans">
-
   <nav class="bg-white shadow-sm border-b border-slate-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center">
-          <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center mr-3">
+          <div
+            class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center mr-3"
+          >
             <span class="text-white font-bold text-sm">P</span>
           </div>
           <span class="font-bold text-xl text-slate-800">Área do Cliente</span>
         </div>
         <div class="flex items-center space-x-4">
-          <span class="text-sm font-medium text-slate-600">{{ usuarioLogado }}</span>
-          <button (click)="authService.logout()" class="text-slate-500 hover:text-red-600 text-sm font-bold transition">
+          <span class="text-sm font-medium text-slate-600">{{
+            usuarioLogado
+          }}</span>
+          <button
+            (click)="authService.logout()"
+            class="text-slate-500 hover:text-red-600 text-sm font-bold transition"
+          >
             Sair
           </button>
         </div>
@@ -20,22 +26,37 @@
   </nav>
 
   <main class="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-slate-800">Bem-vindo(a) de volta! 👋</h1>
-      <p class="text-slate-500 mt-2">Acompanhe o andamento dos seus projetos em tempo real.</p>
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-slate-800">
+          Bem-vindo(a) de volta! 👋
+        </h1>
+        <p class="text-slate-500 mt-2">
+          Acompanhe o andamento dos seus projetos em tempo real.
+        </p>
+      </div>
+
+      <p class="text-slate-500 mt-2">
+        Acompanhe o andamento dos seus projetos em tempo real.
+      </p>
     </div>
 
     <div class="space-y-6">
-      <div *ngFor="let projeto of meusProjetos" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition">
-
+      <div
+        *ngFor="let projeto of meusProjetos"
+        class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition"
+      >
         <div class="bg-slate-800 p-6 text-white">
           <div class="flex justify-between items-start">
             <div>
               <h2 class="text-2xl font-bold">{{ projeto.title }}</h2>
-              <p class="text-slate-300 text-sm mt-1">ID do Contrato: {{ projeto.id.split('-')[0] }}</p>
+              <p class="text-slate-300 text-sm mt-1">
+                ID do Contrato: {{ projeto.id.split('-')[0] }}
+              </p>
             </div>
-            <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold px-3 py-1 rounded-full">
+            <span
+              class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold px-3 py-1 rounded-full"
+            >
               Em Andamento
             </span>
           </div>
@@ -45,27 +66,49 @@
           <p class="text-slate-600 mb-6">{{ projeto.description }}</p>
 
           <div class="border-t border-slate-100 pt-6 mt-2">
-            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4">Ações Disponíveis</h3>
+            <h3
+              class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4"
+            >
+              Ações Disponíveis
+            </h3>
 
             <button
               [routerLink]="['/portal/project', projeto.id]"
-              class="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold py-3 px-6 rounded-lg transition flex items-center w-full justify-center sm:w-auto">
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+              class="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold py-3 px-6 rounded-lg transition flex items-center w-full justify-center sm:w-auto"
+            >
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                ></path>
+              </svg>
               Acompanhar Etapas e Comentários
             </button>
           </div>
         </div>
-
       </div>
 
-      <div *ngIf="meusProjetos.length === 0" class="bg-white p-10 text-center rounded-2xl shadow-sm border border-slate-200">
-        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+      <div
+        *ngIf="meusProjetos.length === 0"
+        class="bg-white p-10 text-center rounded-2xl shadow-sm border border-slate-200"
+      >
+        <div
+          class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4"
+        >
           <span class="text-2xl">📭</span>
         </div>
         <h3 class="text-lg font-bold text-slate-800">Nenhum projeto ativo</h3>
-        <p class="text-slate-500 mt-2">Você ainda não possui projetos vinculados à sua conta.</p>
+        <p class="text-slate-500 mt-2">
+          Você ainda não possui projetos vinculados à sua conta.
+        </p>
       </div>
     </div>
-
   </main>
 </div>

@@ -1,36 +1,51 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // 👈 Importamos o ChangeDetectorRef
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
-import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './admin-dashboard.component.html',
-  styleUrls: ['./admin-dashboard.component.scss']
+  styleUrls: ['./admin-dashboard.component.scss'],
 })
 export class AdminDashboardComponent implements OnInit {
-  projetosDoBanco: any[] = [];
-  usuarioLogado: string | null = '';
+  projetos: any[] = [];
+  isLoading = true;
 
-  // Injetamos a API e a Autenticação
-  constructor(private apiService: ApiService, public authService: AuthService) {}
+  constructor(
+    private apiService: ApiService,
+    public authService: AuthService,
+    private cdr: ChangeDetectorRef, // 👈 Injetamos o "Gritador" aqui
+  ) {}
 
   ngOnInit() {
-    // Pega o e-mail de quem logou (que salvamos no localStorage)
-    this.usuarioLogado = localStorage.getItem('userEmail');
     this.carregarProjetos();
   }
 
   carregarProjetos() {
+    this.isLoading = true;
     this.apiService.getProjects().subscribe({
-      next: (dados) => {
-        this.projetosDoBanco = dados;
-        console.log('Projetos carregados:', dados);
+      next: (dados: any) => {
+        let arraySeguro = [];
+        if (Array.isArray(dados)) arraySeguro = dados;
+        else if (dados && dados.data && Array.isArray(dados.data))
+          arraySeguro = dados.data;
+        else if (dados && typeof dados === 'object') arraySeguro = [dados];
+
+        this.projetos = arraySeguro;
+        this.isLoading = false;
+
+        // 👇 O GRITO! "Angular, atualize o HTML imediatamente!"
+        this.cdr.detectChanges();
       },
-      error: (erro) => { console.error('Erro ao buscar projetos:', erro); }
+      error: (err) => {
+        console.error('ERRO HTTP:', err);
+        this.isLoading = false;
+        this.cdr.detectChanges(); // Atualiza a tela mesmo se der erro
+      },
     });
   }
 }

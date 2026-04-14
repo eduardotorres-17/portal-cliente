@@ -1,20 +1,35 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  MinLength,
+  IsOptional,
+} from 'class-validator';
 
 export class CreateUserDto {
-  // O @ApiProperty é o que faz o campo aparecer no Swagger!
-  @ApiProperty({ example: 'Eduardo', description: 'Nome do usuário' })
+  @ApiProperty({ example: 'Eduardo Developer' })
+  @IsNotEmpty({ message: 'O nome é obrigatório' })
   @IsString()
-  @IsNotEmpty({ message: 'O nome não pode estar vazio' })
   name: string;
 
-  @ApiProperty({ example: 'eduardo@email.com', description: 'E-mail válido' })
-  @IsEmail({}, { message: 'Forneça um endereço de e-mail válido' })
-  @IsNotEmpty()
+  @ApiProperty({ example: 'eduardo@empresa.com' })
+  @IsNotEmpty({ message: 'O e-mail é obrigatório' })
+  @IsEmail({}, { message: 'Formato de e-mail inválido' })
   email: string;
 
-  @ApiProperty({ example: 'senha123', description: 'Senha de acesso (mínimo 6 caracteres)' })
+  @ApiProperty({ example: 'CLIENT', required: false })
+  @IsOptional()
+  @IsString()
+  role?: string;
+
+  // 👇 Agora a API de criação exige a senha!
+  @ApiProperty({
+    example: 'senha123',
+    description: 'Senha de acesso do usuário',
+  })
+  @IsNotEmpty({ message: 'A senha é obrigatória' })
   @IsString()
   @MinLength(6, { message: 'A senha deve ter no mínimo 6 caracteres' })
-  password_hash: string;
+  password: string;
 }

@@ -1,16 +1,146 @@
-<div class="space-y-3">
-      <div *ngFor="let user of usuariosDoBanco" class="p-3 bg-gray-50 border border-gray-200 rounded-lg flex justify-between items-center hover:bg-gray-100 transition">
+<div class="min-h-screen flex bg-white font-sans">
+  <div
+    class="hidden lg:flex lg:w-1/2 bg-slate-900 relative items-center justify-center overflow-hidden"
+  >
+    <div
+      class="absolute inset-0 bg-gradient-to-br from-indigo-600/20 to-purple-600/20 backdrop-blur-3xl"
+    ></div>
+
+    <div class="relative z-10 p-12 text-center">
+      <div
+        class="w-16 h-16 bg-indigo-500 rounded-xl flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-indigo-500/30"
+      >
+        <span class="text-white font-bold text-2xl">P</span>
+      </div>
+      <h2 class="text-4xl font-bold text-white mb-4 tracking-tight">
+        Portal do Cliente
+      </h2>
+      <p class="text-slate-400 text-lg max-w-md mx-auto">
+        Acompanhe seus projetos, valide etapas e mantenha a comunicação
+        centralizada em um só lugar.
+      </p>
+    </div>
+  </div>
+
+  <div class="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12">
+    <div class="w-full max-w-md">
+      <div class="mb-10 text-center lg:text-left">
+        <h1 class="text-3xl font-bold text-slate-900 tracking-tight">
+          Bem-vindo de volta
+        </h1>
+        <p class="text-slate-500 mt-2">
+          Insira suas credenciais para acessar sua conta.
+        </p>
+      </div>
+
+      <div
+        *ngIf="errorMessage"
+        class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-md flex items-start"
+        role="alert"
+      >
+        <svg
+          class="w-5 h-5 text-red-500 mt-0.5 mr-3 flex-shrink-0"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          ></path>
+        </svg>
+        <p class="text-sm text-red-700 font-medium">{{ errorMessage }}</p>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
         <div>
-          <p class="font-bold text-gray-800">{{ user.name }}</p>
-          <span class="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs font-bold rounded-full">
-            {{ user.role }}
-          </span>
+          <label
+            for="email"
+            class="block text-sm font-semibold text-slate-700 mb-2"
+            >E-mail corporativo</label
+          >
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            placeholder="voce@empresa.com"
+            class="w-full px-4 py-3 rounded-lg border bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:border-transparent transition-all duration-200"
+            [ngClass]="{
+              'border-red-300 focus:ring-red-500':
+                f['email'].invalid && f['email'].touched,
+            }"
+          />
+          <p
+            *ngIf="f['email'].invalid && f['email'].touched"
+            class="mt-2 text-sm text-red-600 font-medium"
+          >
+            Por favor, insira um e-mail válido.
+          </p>
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label
+              for="password"
+              class="block text-sm font-semibold text-slate-700"
+              >Senha</label
+            >
+            <a
+              href="#"
+              class="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
+              >Esqueceu a senha?</a
+            >
+          </div>
+          <input
+            type="password"
+            id="password"
+            formControlName="password"
+            placeholder="••••••••"
+            class="w-full px-4 py-3 rounded-lg border bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:border-transparent transition-all duration-200"
+            [ngClass]="{
+              'border-red-300 focus:ring-red-500':
+                f['password'].invalid && f['password'].touched,
+            }"
+          />
+          <p
+            *ngIf="f['password'].invalid && f['password'].touched"
+            class="mt-2 text-sm text-red-600 font-medium"
+          >
+            A senha deve ter no mínimo 6 caracteres.
+          </p>
         </div>
 
         <button
-          (click)="authService.login(user.email, user.role)"
-          class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded text-sm transition">
-          Logar
+          type="submit"
+          [disabled]="isLoading"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-lg transition-all duration-200 shadow-lg shadow-indigo-600/30 flex justify-center items-center disabled:opacity-70 disabled:cursor-not-allowed"
+        >
+          <svg
+            *ngIf="isLoading"
+            class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          {{ isLoading ? 'Entrando...' : 'Entrar na plataforma' }}
         </button>
-      </div>
+      </form>
     </div>
+  </div>
+</div>

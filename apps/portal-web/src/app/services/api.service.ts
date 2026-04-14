@@ -3,39 +3,46 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ApiService {
   private apiUrl = 'http://localhost:3000/api';
 
   constructor(private http: HttpClient) {}
 
-  getUsers(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users`);
+  getProjects(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/projects`);
   }
 
-  // 👇 Novo método para buscar os projetos!
-  getProjects(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/projects`);
+  getProjectById(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/projects/${id}`);
   }
 
-  // Adicione este método abaixo do getProjects()
-  getMilestonesByProject(projectId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/milestones/project/${projectId}`);
+  getUsers(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/users`);
   }
 
-  // Busca toda a conversa de uma etapa específica
-  getCommentsByMilestone(milestoneId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/comments/milestone/${milestoneId}`);
+  getMilestonesByProject(projectId: string): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${this.apiUrl}/milestones/project/${projectId}`,
+    );
   }
 
-  // Envia uma nova mensagem
-  createComment(content: string, milestoneId: string, authorId: string): Observable<any> {
-    const payload = {
-      content: content,
+  getCommentsByMilestone(milestoneId: string): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${this.apiUrl}/comments/milestone/${milestoneId}`,
+    );
+  }
+
+  createComment(
+    content: string,
+    milestoneId: string,
+    authorId: string,
+  ): Observable<any> {
+    return this.http.post(`${this.apiUrl}/comments`, {
+      content,
       milestone_id: milestoneId,
-      author_id: authorId
-    };
-    return this.http.post(`${this.apiUrl}/comments`, payload);
+      author_id: authorId,
+    });
   }
 }

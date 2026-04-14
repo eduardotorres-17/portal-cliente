@@ -1,4 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Project } from './project.entity';
 
 @Entity('milestones')
@@ -12,13 +20,17 @@ export class Milestone {
   @Column('text')
   description: string;
 
-  @Column({ type: 'enum', enum: ['PENDING', 'IN_REVIEW', 'APPROVED'], default: 'PENDING' })
+  @Column({
+    type: 'enum',
+    enum: ['PENDING', 'IN_REVIEW', 'APPROVED'],
+    default: 'PENDING',
+  })
   status: string;
 
   @Column('int', { default: 0 })
-  weight: number; // Porcentagem de peso desta etapa no projeto
+  weight: number;
 
-  @ManyToOne(() => Project)
+  @ManyToOne(() => Project, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'project_id' })
   project: Project;
 

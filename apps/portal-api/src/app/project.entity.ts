@@ -1,4 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { User } from './user.entity';
 
 @Entity('projects')
@@ -12,7 +20,11 @@ export class Project {
   @Column('text')
   description: string;
 
-  @Column({ type: 'enum', enum: ['DRAFT', 'IN_PROGRESS', 'PAUSED', 'COMPLETED'], default: 'DRAFT' })
+  @Column({
+    type: 'enum',
+    enum: ['DRAFT', 'IN_PROGRESS', 'PAUSED', 'COMPLETED'],
+    default: 'DRAFT',
+  })
   status: string;
 
   @Column({ type: 'date', nullable: true })
@@ -21,9 +33,8 @@ export class Project {
   @Column({ type: 'date', nullable: true })
   due_date: Date;
 
-  // Relacionamento N:1 (Muitos projetos pertencem a UM usuário/cliente)
-  @ManyToOne(() => User)
-  @JoinColumn({ name: 'client_id' })
+  @ManyToOne(() => User, { eager: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'clientId' })
   client: User;
 
   @CreateDateColumn()

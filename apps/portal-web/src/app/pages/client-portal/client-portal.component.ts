@@ -1,22 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
-import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-client-portal',
   standalone: true,
-  imports: [CommonModule, RouterModule
-  ],
+  imports: [CommonModule, RouterModule],
   templateUrl: './client-portal.component.html',
-  styleUrls: ['./client-portal.component.scss']
+  styleUrls: ['./client-portal.component.scss'],
 })
 export class ClientPortalComponent implements OnInit {
   meusProjetos: any[] = [];
   usuarioLogado: string | null = '';
+  isLoading = true;
 
-  constructor(private apiService: ApiService, public authService: AuthService) {}
+  constructor(
+    private apiService: ApiService,
+    public authService: AuthService,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit() {
     this.usuarioLogado = localStorage.getItem('userEmail');
@@ -24,14 +28,36 @@ export class ClientPortalComponent implements OnInit {
   }
 
   carregarMeusProjetos() {
+    this.isLoading = true;
     this.apiService.getProjects().subscribe({
-      next: (dados: any[]) => {
-        // Mágica do Front-end: Filtramos os projetos para mostrar SÓ os deste cliente
-        this.meusProjetos = dados.filter(projeto =>
-          projeto.client && projeto.client.email === this.usuarioLogado
+      next: (dados: any) => {
+        console.log('🔥 [FRONTEND DEBUG] DADOS BRUTOS RECEBIDOS:', dados);
+
+        let arraySeguro = [];
+
+        if (Array.isArray(dados)) {
+          arraySeguro = dados;
+        } else if (dados && dados.data && Array.isArray(dados.data)) {
+          arraySeguro = dados.data;
+        } else if (dados && typeof dados === 'object') {
+          arraySeguro = [dados];
+        }
+
+        console.log(
+          '🛡️ [FRONTEND DEBUG] ARRAY FINAL QUE VAI PRA TELA:',
+          arraySeguro,
         );
+
+        this.meusProjetos = arraySeguro;
+        this.isLoading = false;
+
+        this.cdr.detectChanges();
       },
-      error: (erro) => console.error('Erro ao buscar projetos do cliente:', erro)
+      error: (err) => {
+        console.error('🚨 [FRONTEND DEBUG] ERRO HTTP:', err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
     });
   }
 }

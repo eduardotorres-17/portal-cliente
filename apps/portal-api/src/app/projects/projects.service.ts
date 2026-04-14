@@ -1,45 +1,70 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Project } from '../project.entity';
 import { User } from '../user.entity';
-import { CreateProjectDto } from './dto/create-project.dto';
 
 @Injectable()
 export class ProjectsService {
   constructor(
-    @InjectRepository(Project)
-    private projectsRepository: Repository<Project>,
-
-    // Importamos o repositório de User para podermos validar o client_id
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    @InjectRepository(Project) private projectsRepository: Repository<Project>,
+    @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}
 
-  async create(createProjectDto: CreateProjectDto): Promise<Project> {
-    // 1. Verifica se o cliente existe
-    const client = await this.usersRepository.findOneBy({ id: createProjectDto.client_id });
-
-    if (!client) {
-      throw new NotFoundException('Cliente não encontrado com o ID fornecido.');
-    }
-
-    if (client.role !== 'CLIENT') {
-      throw new BadRequestException('Apenas usuários com a role CLIENT podem ser donos de projetos.');
-    }
-
-    // 2. Cria o projeto atrelando a entidade do cliente
-    const newProject = this.projectsRepository.create({
-      ...createProjectDto,
-      client: client, // Fazemos a ligação da chave estrangeira aqui!
+  async create(createProjectDto: any) {
+    const client = await this.usersRepository.findOne({
+      where: { id: createProjectDto.clientId },
     });
+    if (!client) throw new NotFoundException('Cliente não encontrado');
 
-    // 3. Salva no banco
-    return this.projectsRepository.save(newProject);
+    const project = this.projectsRepository.create({
+      title: createProjectDto.title,
+      description: createProjectDto.description,
+      client: client,
+    });
+    return this.projectsRepository.save(project);
   }
 
-  async findAll(): Promise<Project[]> {
-    // Trazemos os projetos já com os dados do cliente embutidos (JOIN)
-    return this.projectsRepository.find({ relations: ['client'] });
+  async findAll(userLogged: any) {
+    // 👇 O DETECTOR DE MENTIRAS NO TERMINAL DO NESTJS 👇
+    console.log('\n--- NOVA REQUISIÇÃO DO ANGULAR ---');
+    console.log('Quem está pedindo?', userLogged);
+
+    // Adicionamos o .toUpperCase() para ignorar diferenças de maiúsculas/minúsculas no banco!
+    if (userLogged.role.toUpperCase() === 'ADMIN') {
+      console.log('👉 Resultado: É um ADMIN! Retornando o banco inteiro...');
+      return this.projectsRepository.find({ relations: ['client'] });
+    }
+
+    console.log('👉 Resultado: É um CLIENT! Buscando apenas projetos do ID:', userLogged.sub);
+    return this.projectsRepository.find({
+      where: { client: { id: userLogged.sub } },
+      relations: ['client']
+    });
+  }
+
+  async findOne(id: string, userLogged: any) {
+    const project = await this.projectsRepository.findOne({
+      where: { id },
+      relations: ['client'],
+    });
+
+    if (!project) throw new NotFoundException('Projeto não encontrado');
+
+    if (userLogged.role === 'CLIENT' && project.client.id !== userLogged.sub) {
+      throw new UnauthorizedException('Acesso negado a este projeto');
+    }
+
+    return project;
+  }
+
+  async remove(id: string) {
+    const project = await this.projectsRepository.findOne({ where: { id } });
+    if (!project) throw new NotFoundException('Projeto não encontrado');
+    return this.projectsRepository.remove(project);
   }
 }

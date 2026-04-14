@@ -7,7 +7,6 @@ import { authGuard } from './services/auth.guard';
 
 export const appRoutes: Route[] = [
   { path: 'login', component: LoginComponent },
-
   {
     path: 'admin',
     component: AdminDashboardComponent,
@@ -20,23 +19,18 @@ export const appRoutes: Route[] = [
     canActivate: [authGuard],
     data: { expectedRole: 'CLIENT' },
   },
-
-  // 👇 A rota do Admin
   {
     path: 'admin/project/:id',
     component: ProjectDetailsComponent,
     canActivate: [authGuard],
     data: { expectedRole: 'ADMIN' },
   },
-
-  // 👇 A NOVA ROTA DO CLIENTE (Aponta para o mesmo componente!)
   {
     path: 'portal/project/:id',
     component: ProjectDetailsComponent,
     canActivate: [authGuard],
     data: { expectedRole: 'CLIENT' },
   },
-
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', redirectTo: 'login' },
 ];

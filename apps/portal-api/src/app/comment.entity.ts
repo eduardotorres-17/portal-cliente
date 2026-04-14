@@ -1,4 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Milestone } from './milestone.entity';
 import { User } from './user.entity';
 
@@ -10,11 +18,11 @@ export class Comment {
   @Column('text')
   content: string;
 
-  @ManyToOne(() => Milestone)
+  @ManyToOne(() => Milestone, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'milestone_id' })
   milestone: Milestone;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'author_id' })
   author: User;
 

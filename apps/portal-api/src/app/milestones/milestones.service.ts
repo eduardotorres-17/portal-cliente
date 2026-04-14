@@ -10,36 +10,44 @@ export class MilestonesService {
   constructor(
     @InjectRepository(Milestone)
     private milestonesRepository: Repository<Milestone>,
-    
-    // Injetamos o repositório de Projetos para validar a chave estrangeira
     @InjectRepository(Project)
     private projectsRepository: Repository<Project>,
   ) {}
 
   async create(createMilestoneDto: CreateMilestoneDto): Promise<Milestone> {
-    // 1. Verifica se o projeto pai existe
-    const project = await this.projectsRepository.findOneBy({ id: createMilestoneDto.project_id });
-    
+    const project = await this.projectsRepository.findOneBy({
+      id: createMilestoneDto.project_id,
+    });
+
     if (!project) {
       throw new NotFoundException('Projeto não encontrado com o ID fornecido.');
     }
 
-    // 2. Cria a etapa atrelando a entidade do projeto
     const newMilestone = this.milestonesRepository.create({
       ...createMilestoneDto,
-      project: project, // Chave estrangeira!
+      project: project,
     });
 
-    // 3. Salva no banco
     return this.milestonesRepository.save(newMilestone);
   }
 
-  // ⚠️ Nova Função Estratégica! 
-  // No Front-end, o cliente só vai querer ver as etapas do projeto DELE, não de todos.
   async findAllByProject(projectId: string): Promise<Milestone[]> {
-    return this.milestonesRepository.find({ 
-        where: { project: { id: projectId } },
-        relations: ['project'] 
+    return this.milestonesRepository.find({
+      where: { project: { id: projectId } },
+      relations: ['project'],
     });
+  }
+
+  // 👇 Novo: Busca etapa por ID
+  async findOne(id: string): Promise<Milestone> {
+    const milestone = await this.milestonesRepository.findOneBy({ id });
+    if (!milestone) throw new NotFoundException('Etapa não encontrada.');
+    return milestone;
+  }
+
+  // 👇 Novo: Remove a etapa (O banco apagará os comentários dela em cascata!)
+  async remove(id: string): Promise<Milestone> {
+    const milestone = await this.findOne(id);
+    return this.milestonesRepository.remove(milestone);
   }
 }

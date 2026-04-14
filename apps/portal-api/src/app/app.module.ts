@@ -6,6 +6,7 @@ import { User } from './user.entity';
 import { Project } from './project.entity';
 import { Milestone } from './milestone.entity';
 import { Comment } from './comment.entity';
+import { AuthModule } from './auth/auth.module';
 
 // Importe o módulo recém-criado
 import { UsersModule } from './users/users.module';
@@ -23,13 +24,14 @@ import { CommentsModule } from './comments/comments.module';
       password: 'adminpassword',
       database: 'portal_db',
       entities: [User, Project, Milestone, Comment],
-      synchronize: true,
+      synchronize: false,
     }),
     // Avise o NestJS que o módulo de usuários existe!
     UsersModule,
     ProjectsModule,
     MilestonesModule,
     CommentsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
