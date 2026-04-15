@@ -1,52 +1,64 @@
-<div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-4xl mx-auto">
-    <a
-      [routerLink]="linkDeRetorno"
-      class="text-indigo-600 hover:text-indigo-800 font-medium text-sm flex items-center mb-6 transition"
-    >
-      ← Voltar para o {{ linkDeRetorno === '/admin' ? 'Dashboard' : 'Portal' }}
-    </a>
+<div class="min-h-screen bg-zinc-950 py-12 px-6 text-zinc-100">
+  <div class="max-w-5xl mx-auto">
+    <header class="flex justify-between items-center mb-12">
+      <a
+        [routerLink]="linkDeRetorno"
+        class="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-lime-400 transition"
+        >← Dashboard</a
+      >
 
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-      <h1 class="text-2xl font-bold text-gray-800">Gerenciamento de Etapas</h1>
-      <p class="text-gray-500 text-sm mt-1">
-        ID do Projeto:
-        <span class="font-mono bg-gray-100 px-2 py-1 rounded">{{
-          projectId
-        }}</span>
-      </p>
+      <div class="flex items-center space-x-8">
+        <div class="text-right">
+          <p
+            class="text-[10px] font-black uppercase text-zinc-500 mb-1 tracking-widest"
+          >
+            Status do Sprint
+          </p>
+          <div class="flex items-center space-x-3">
+            <span class="text-2xl font-black text-white">{{ totalPeso }}%</span>
+            <div class="w-32 h-4 bg-zinc-800 border border-zinc-700">
+              <div
+                class="h-full bg-lime-400 shadow-[0_0_15px_rgba(190,242,100,0.5)] transition-all duration-700"
+                [style.width.%]="totalPeso"
+              ></div>
+            </div>
+          </div>
+        </div>
+        <button
+          *ngIf="isAdmin"
+          [disabled]="totalPeso >= 100"
+          (click)="exibirModalMilestone = true"
+          class="bg-fuchsia-600 disabled:opacity-30 text-white font-black uppercase tracking-widest py-3 px-6 shadow-[4px_4px_0_0_rgba(190,242,100,1)] hover:translate-y-[-2px] transition-transform"
+        >
+          Nova Etapa
+        </button>
+      </div>
+    </header>
+
+    <div
+      *ngIf="totalPeso === 100"
+      class="mb-12 bg-lime-400 p-6 shadow-[10px_10px_0_0_rgba(162,28,175,1)]"
+    >
+      <h3
+        class="text-zinc-950 font-black uppercase italic text-2xl tracking-tighter text-center"
+      >
+        Protocolo Completo. Projeto 100% Validado.
+      </h3>
     </div>
 
-    <h2 class="text-lg font-bold text-gray-700 mb-4">
-      Etapas do Projeto (Milestones)
-    </h2>
-
-    <div class="space-y-4">
+    <div class="grid grid-cols-1 gap-6">
       <div
         *ngFor="let milestone of milestones"
-        class="bg-white rounded-lg shadow-sm border border-l-4 border-l-indigo-500 overflow-hidden"
+        class="bg-zinc-900 border-2 border-zinc-800 transition-all overflow-hidden group relative"
       >
-        <div
-          class="p-5 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition"
-          (click)="abrirChat(milestone.id)"
-        >
-          <div>
-            <h3 class="text-lg font-bold text-gray-800">
-              {{ milestone.title }}
-            </h3>
-            <p class="text-gray-600 text-sm mt-1">
-              {{ milestone.description }}
-            </p>
-          </div>
-          <div class="flex items-center space-x-4">
-            <span
-              class="inline-block bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full"
-            >
-              Peso: {{ milestone.weight }}%
-            </span>
+        <div class="absolute top-0 right-0 p-4 z-10">
+          <button
+            *ngIf="isAdmin"
+            (click)="excluirMilestone(milestone.id, $event)"
+            class="text-zinc-700 hover:text-red-500 transition"
+          >
             <svg
-              class="w-5 h-5 text-gray-400 transform transition-transform"
-              [class.rotate-180]="etapaAtivaId === milestone.id"
+              class="w-5 h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -55,92 +67,169 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M19 9l-7 7-7-7"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
               ></path>
+            </svg>
+          </button>
+        </div>
+
+        <div
+          class="p-8 flex justify-between items-center cursor-pointer hover:bg-zinc-800"
+          (click)="abrirChat(milestone.id)"
+        >
+          <div class="flex items-center space-x-6">
+            <div
+              class="w-12 h-12 flex items-center justify-center border-2 border-zinc-700 font-black text-xl group-hover:border-lime-400 text-zinc-500 group-hover:text-white transition"
+            >
+              #
+            </div>
+            <div>
+              <h3
+                class="text-xl font-black uppercase tracking-tight text-white mb-1 pr-8"
+              >
+                {{ milestone.title }}
+              </h3>
+              <p class="text-zinc-500 text-sm max-w-md">
+                {{ milestone.description }}
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-6 pr-8">
+            <span class="font-black text-lime-400 tracking-widest"
+              >{{ milestone.weight }}%</span
+            >
+            <svg
+              class="w-6 h-6 text-zinc-700 transition-transform"
+              [class.rotate-180]="etapaAtivaId === milestone.id"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19 9l-7 7-7-7" stroke-width="3"></path>
             </svg>
           </div>
         </div>
 
         <div
           *ngIf="etapaAtivaId === milestone.id"
-          class="border-t border-gray-200 bg-gray-50 p-5"
+          class="border-t-2 border-zinc-800 bg-zinc-950 p-8"
         >
-          <h4
-            class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4"
+          <div
+            class="space-y-6 mb-8 max-h-96 overflow-y-auto font-mono text-sm pr-4"
           >
-            Histórico de Alterações
-          </h4>
-
-          <div class="space-y-3 mb-4 max-h-60 overflow-y-auto pr-2">
             <div
               *ngFor="let msg of comentariosDaEtapa"
-              class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm"
+              class="border-l-2 pl-4"
+              [ngClass]="
+                msg.author?.role === 'ADMIN'
+                  ? 'border-fuchsia-600'
+                  : 'border-lime-400'
+              "
             >
-              <div class="flex justify-between items-center mb-1">
+              <div
+                class="flex items-center space-x-3 mb-2 opacity-50 uppercase text-[10px] font-bold"
+              >
                 <span
-                  class="font-bold text-sm"
                   [ngClass]="
-                    msg.author.role === 'ADMIN'
-                      ? 'text-indigo-600'
-                      : 'text-emerald-600'
+                    msg.author?.role === 'ADMIN'
+                      ? 'text-fuchsia-500'
+                      : 'text-lime-400'
                   "
+                  >{{ msg.author?.name }}</span
                 >
-                  {{ msg.author.name }} ({{ msg.author.role }})
-                </span>
-                <span class="text-xs text-gray-400">{{
-                  msg.created_at | date: 'short'
-                }}</span>
+                <span>—</span>
+                <span>{{ msg.created_at | date: 'HH:mm' }}</span>
               </div>
-              <p class="text-gray-700 text-sm">{{ msg.content }}</p>
-            </div>
-
-            <div
-              *ngIf="comentariosDaEtapa.length === 0"
-              class="text-center text-gray-500 text-sm py-4"
-            >
-              Nenhum comentário nesta etapa ainda.
+              <p class="text-zinc-300 leading-relaxed">{{ msg.content }}</p>
             </div>
           </div>
-
-          <div class="flex space-x-2 mt-4 pt-4 border-t border-gray-200">
+          <div class="flex space-x-4">
             <input
-              type="text"
               [(ngModel)]="novaMensagem"
               (keyup.enter)="enviarMensagem()"
-              placeholder="Digite sua mensagem..."
-              class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              placeholder="INSERIR LOG..."
+              class="flex-1 bg-zinc-900 border-2 border-zinc-800 p-4 text-lime-400 font-mono focus:outline-none focus:border-fuchsia-600"
             />
-
             <button
               (click)="enviarMensagem()"
-              class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition flex items-center"
+              class="bg-zinc-100 hover:bg-lime-400 text-zinc-950 font-black uppercase px-8 py-4 transition"
             >
-              <svg
-                class="w-4 h-4 mr-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                ></path>
-              </svg>
               Enviar
             </button>
           </div>
         </div>
       </div>
+    </div>
 
+    <div
+      *ngIf="exibirModalMilestone"
+      class="fixed inset-0 bg-zinc-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4"
+    >
       <div
-        *ngIf="milestones.length === 0"
-        class="text-center py-10 bg-white rounded-lg border border-dashed border-gray-300"
+        class="bg-zinc-900 border-4 border-fuchsia-600 w-full max-w-md p-10 shadow-[20px_20px_0_0_rgba(190,242,100,1)]"
       >
-        <p class="text-gray-500">
-          Nenhuma etapa cadastrada neste projeto ainda.
-        </p>
+        <h2
+          class="text-3xl font-black uppercase tracking-tighter text-white mb-8"
+        >
+          Setup de Etapa
+        </h2>
+        <div class="space-y-6">
+          <div class="relative">
+            <input
+              [(ngModel)]="novaMilestone.title"
+              placeholder=" "
+              class="block w-full px-0 py-3 bg-transparent border-0 border-b-2 border-zinc-700 text-white focus:outline-none focus:border-fuchsia-600 peer"
+            />
+            <label
+              class="absolute text-xs font-black uppercase tracking-widest text-zinc-500 -translate-y-6 top-3 peer-placeholder-shown:translate-y-0 peer-focus:-translate-y-6 transition-all"
+              >Título da Etapa</label
+            >
+          </div>
+
+          <div class="relative">
+            <textarea
+              [(ngModel)]="novaMilestone.description"
+              placeholder=" "
+              rows="2"
+              class="block w-full px-0 py-3 bg-transparent border-0 border-b-2 border-zinc-700 text-white focus:outline-none focus:border-fuchsia-600 peer resize-none"
+            ></textarea>
+            <label
+              class="absolute text-xs font-black uppercase tracking-widest text-zinc-500 -translate-y-6 top-3 peer-placeholder-shown:translate-y-0 peer-focus:-translate-y-6 transition-all"
+              >Descrição</label
+            >
+          </div>
+
+          <div class="relative pt-2">
+            <label
+              class="text-xs font-black uppercase tracking-widest text-zinc-500 mb-2 block"
+              >Peso da Etapa (%)</label
+            >
+            <input
+              type="number"
+              [(ngModel)]="novaMilestone.weight"
+              class="w-full bg-zinc-800 text-white p-3 border-0 border-b-2 border-zinc-700 focus:ring-0 outline-none font-bold text-lg"
+            />
+            <p
+              class="text-[10px] text-lime-400 mt-2 uppercase font-bold tracking-widest"
+            >
+              Disponível: {{ 100 - totalPeso }}%
+            </p>
+          </div>
+        </div>
+        <div class="flex space-x-4 mt-12">
+          <button
+            (click)="exibirModalMilestone = false"
+            class="flex-1 py-4 font-black uppercase tracking-widest text-zinc-500 hover:text-white transition"
+          >
+            Abortar
+          </button>
+          <button
+            (click)="salvarMilestone()"
+            class="flex-1 py-4 font-black uppercase tracking-widest text-zinc-950 bg-lime-400 hover:bg-lime-500 transition shadow-[4px_4px_0_0_rgba(162,28,175,1)]"
+          >
+            Confirmar
+          </button>
+        </div>
       </div>
     </div>
   </div>

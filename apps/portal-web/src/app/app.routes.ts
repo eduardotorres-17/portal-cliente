@@ -4,12 +4,21 @@ import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard
 import { ClientPortalComponent } from './pages/client-portal/client-portal.component';
 import { ProjectDetailsComponent } from './pages/project-details/project-details.component';
 import { authGuard } from './services/auth.guard';
+import { AdminUsersComponent } from './pages/admin-users/admin-users.component';
+import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 
 export const appRoutes: Route[] = [
   { path: 'login', component: LoginComponent },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
   {
     path: 'admin',
     component: AdminDashboardComponent,
+    canActivate: [authGuard],
+    data: { expectedRole: 'ADMIN' },
+  },
+  {
+    path: 'admin/users',
+    component: AdminUsersComponent,
     canActivate: [authGuard],
     data: { expectedRole: 'ADMIN' },
   },

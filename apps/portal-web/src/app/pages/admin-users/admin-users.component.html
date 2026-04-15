@@ -1,0 +1,196 @@
+<div
+  class="min-h-screen bg-zinc-950 flex text-zinc-100 selection:bg-lime-400 selection:text-zinc-950"
+>
+  <aside
+    class="w-64 bg-zinc-900 hidden md:flex flex-col border-r border-zinc-800"
+  >
+    <div class="p-8">
+      <div class="flex items-center space-x-3 mb-10">
+        <svg width="40" height="40" viewBox="0 0 120 120" fill="none">
+          <rect width="120" height="120" rx="20" fill="#a21caf" />
+          <path d="M85 35H35V85H85V60H60" stroke="#bef264" stroke-width="12" />
+          <rect x="35" y="35" width="25" height="25" fill="#bef264" />
+        </svg>
+        <span class="text-xl font-black uppercase tracking-tighter"
+          >Dev<span class="text-lime-400">Portal</span></span
+        >
+      </div>
+
+      <nav class="space-y-4">
+        <a
+          routerLink="/admin"
+          class="flex items-center space-x-3 text-zinc-500 hover:text-lime-400 p-3 font-bold uppercase text-xs tracking-widest transition"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+            ></path>
+          </svg>
+          <span>Projetos</span>
+        </a>
+        <a
+          routerLink="/admin/users"
+          class="flex items-center space-x-3 bg-lime-400 text-zinc-950 p-3 font-bold uppercase text-xs tracking-widest shadow-[4px_4px_0_0_rgba(162,28,175,1)]"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+            ></path>
+          </svg>
+          <span>Usuários</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="p-6 mt-auto border-t border-zinc-800">
+      <button
+        (click)="authService.logout()"
+        class="flex items-center space-x-3 text-zinc-500 hover:text-red-500 p-3 font-bold uppercase text-[10px] tracking-widest transition w-full"
+      >
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+          ></path>
+        </svg>
+        <span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="flex-1 p-10 overflow-y-auto bg-zinc-950 text-white">
+    <header class="flex justify-between items-end mb-16">
+      <div>
+        <h1 class="text-5xl font-black uppercase tracking-tighter text-white">
+          Database de <span class="text-fuchsia-600">Usuários</span>
+        </h1>
+        <div class="h-2 w-24 bg-lime-400 mt-2"></div>
+      </div>
+      <button
+        (click)="exibirModal = true"
+        class="bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-black uppercase tracking-widest py-4 px-8 transition-all shadow-[6px_6px_0_0_rgba(190,242,100,1)] hover:translate-y-[-2px]"
+      >
+        + Inserir Usuário
+      </button>
+    </header>
+
+    <div class="bg-zinc-900 border-2 border-zinc-800 overflow-hidden">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr
+            class="bg-zinc-800 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 border-b-2 border-zinc-700"
+          >
+            <th class="p-6">Identidade</th>
+            <th class="p-6">Endereço de E-mail</th>
+            <th class="p-6">Nível</th>
+            <th class="p-6 text-right">Controles</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-zinc-800">
+          <tr
+            *ngFor="let user of usuarios"
+            class="hover:bg-zinc-800/50 transition group"
+          >
+            <td
+              class="p-6 font-black uppercase text-sm tracking-tight group-hover:text-lime-400"
+            >
+              {{ user.name }}
+            </td>
+            <td class="p-6 text-zinc-500 font-mono text-xs">
+              {{ user.email }}
+            </td>
+            <td class="p-6">
+              <span
+                class="px-3 py-1 text-[10px] font-black uppercase tracking-widest border"
+                [ngClass]="
+                  user.role === 'ADMIN'
+                    ? 'border-fuchsia-500 text-fuchsia-500'
+                    : 'border-lime-500 text-lime-500'
+                "
+              >
+                {{ user.role }}
+              </span>
+            </td>
+            <td class="p-6 text-right">
+              <button
+                (click)="excluirUsuario(user.id)"
+                class="text-zinc-600 hover:text-red-500 font-black uppercase text-[10px] tracking-widest transition"
+              >
+                Deletar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div
+      *ngIf="exibirModal"
+      class="fixed inset-0 bg-zinc-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-zinc-900 border-4 border-fuchsia-600 w-full max-w-md p-10 shadow-[20px_20px_0_0_rgba(190,242,100,1)]"
+      >
+        <h2
+          class="text-3xl font-black uppercase tracking-tighter text-white mb-8"
+        >
+          Novo Acesso
+        </h2>
+        <div class="space-y-6">
+          <input
+            [(ngModel)]="novoUsuario.name"
+            placeholder="Nome Completo"
+            class="w-full px-4 py-3 bg-zinc-800 border-0 border-b-2 border-zinc-700 text-white focus:ring-0 focus:border-fuchsia-600 outline-none"
+          />
+          <input
+            [(ngModel)]="novoUsuario.email"
+            type="email"
+            placeholder="E-mail Corporativo"
+            class="w-full px-4 py-3 bg-zinc-800 border-0 border-b-2 border-zinc-700 text-white focus:ring-0 focus:border-fuchsia-600 outline-none"
+          />
+          <input
+            [(ngModel)]="novoUsuario.password"
+            type="password"
+            placeholder="Senha Provisória"
+            class="w-full px-4 py-3 bg-zinc-800 border-0 border-b-2 border-zinc-700 text-white focus:ring-0 focus:border-fuchsia-600 outline-none"
+          />
+          <select
+            [(ngModel)]="novoUsuario.role"
+            class="w-full px-4 py-3 bg-zinc-800 border-0 border-b-2 border-zinc-700 text-white focus:ring-0 focus:border-fuchsia-600 outline-none font-bold text-xs tracking-widest uppercase"
+          >
+            <option value="CLIENT">Cliente</option>
+            <option value="ADMIN">Administrador</option>
+          </select>
+        </div>
+        <div class="flex space-x-4 mt-12">
+          <button
+            (click)="exibirModal = false"
+            class="flex-1 py-4 font-black uppercase tracking-widest text-zinc-500 hover:text-white transition"
+          >
+            Cancelar
+          </button>
+          <button
+            (click)="salvarUsuario()"
+            class="flex-1 py-4 font-black uppercase tracking-widest text-white bg-fuchsia-600 hover:bg-fuchsia-700 transition"
+          >
+            Salvar
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

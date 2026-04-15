@@ -14,6 +14,7 @@ import { AuthService } from '../../services/auth.service';
 export class ClientPortalComponent implements OnInit {
   meusProjetos: any[] = [];
   usuarioLogado: string | null = '';
+  nomeUsuario: string | null = '';
   isLoading = true;
 
   constructor(
@@ -24,6 +25,8 @@ export class ClientPortalComponent implements OnInit {
 
   ngOnInit() {
     this.usuarioLogado = localStorage.getItem('userEmail');
+    const nomeCompleto = localStorage.getItem('userName') || 'Cliente';
+    this.nomeUsuario = nomeCompleto.split(' ')[0];
     this.carregarMeusProjetos();
   }
 

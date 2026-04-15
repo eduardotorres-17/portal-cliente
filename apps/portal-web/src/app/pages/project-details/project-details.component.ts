@@ -16,7 +16,12 @@ export class ProjectDetailsComponent implements OnInit {
   milestones: any[] = [];
   projectId: string = '';
   linkDeRetorno: string = '/login';
+  isAdmin = false;
+  exibirModalMilestone = false;
 
+  totalPeso = 0;
+
+  novaMilestone = { title: '', description: '', weight: 10, project_id: '' };
   etapaAtivaId: string | null = null;
   comentariosDaEtapa: any[] = [];
   novaMensagem: string = '';
@@ -30,28 +35,55 @@ export class ProjectDetailsComponent implements OnInit {
 
   ngOnInit() {
     this.projectId = this.route.snapshot.params['id'];
+    this.novaMilestone.project_id = this.projectId;
+    this.isAdmin = localStorage.getItem('userRole') === 'ADMIN';
+    this.linkDeRetorno = this.isAdmin ? '/admin' : '/portal';
     this.carregarMilestones();
-
-    const role = localStorage.getItem('userRole');
-    this.linkDeRetorno = role === 'ADMIN' ? '/admin' : '/portal';
   }
 
   carregarMilestones() {
     this.apiService.getMilestonesByProject(this.projectId).subscribe({
       next: (dados: any) => {
-        let arraySeguro = [];
-        if (Array.isArray(dados)) arraySeguro = dados;
-        else if (dados && dados.data && Array.isArray(dados.data))
-          arraySeguro = dados.data;
-        else if (dados && typeof dados === 'object') arraySeguro = [dados];
+        this.milestones = Array.isArray(dados) ? dados : [];
+        this.atualizarProgressoTotal();
+        this.cdr.detectChanges();
+      },
+    });
+  }
 
-        this.milestones = arraySeguro;
-        this.cdr.detectChanges();
+  atualizarProgressoTotal() {
+    this.totalPeso = this.milestones.reduce(
+      (soma, etapa) => soma + Number(etapa.weight),
+      0,
+    );
+  }
+
+  salvarMilestone() {
+    if (this.totalPeso + Number(this.novaMilestone.weight) > 100) {
+      alert(
+        `Erro: A soma não pode ultrapassar 100%. Espaço disponível: ${100 - this.totalPeso}%`,
+      );
+      return;
+    }
+    this.apiService.createMilestone(this.novaMilestone).subscribe({
+      next: () => {
+        this.exibirModalMilestone = false;
+        this.novaMilestone = {
+          title: '',
+          description: '',
+          weight: 10,
+          project_id: this.projectId,
+        };
+        this.carregarMilestones();
       },
-      error: (err) => {
-        console.error('Erro ao buscar as etapas:', err);
-        this.cdr.detectChanges();
-      },
+    });
+  }
+
+  excluirMilestone(id: string, event: Event) {
+    event.stopPropagation();
+    if (!confirm('Excluir esta etapa?')) return;
+    this.apiService.deleteMilestone(id).subscribe({
+      next: () => this.carregarMilestones(),
     });
   }
 
@@ -60,7 +92,6 @@ export class ProjectDetailsComponent implements OnInit {
       this.etapaAtivaId = null;
       return;
     }
-
     this.etapaAtivaId = milestoneId;
     this.carregarComentarios(milestoneId);
   }
@@ -68,17 +99,7 @@ export class ProjectDetailsComponent implements OnInit {
   carregarComentarios(milestoneId: string) {
     this.apiService.getCommentsByMilestone(milestoneId).subscribe({
       next: (dados: any) => {
-        let arraySeguro = [];
-        if (Array.isArray(dados)) arraySeguro = dados;
-        else if (dados && dados.data && Array.isArray(dados.data))
-          arraySeguro = dados.data;
-        else if (dados && typeof dados === 'object') arraySeguro = [dados];
-
-        this.comentariosDaEtapa = arraySeguro;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Erro ao carregar chat:', err);
+        this.comentariosDaEtapa = Array.isArray(dados) ? dados : [];
         this.cdr.detectChanges();
       },
     });
@@ -86,22 +107,15 @@ export class ProjectDetailsComponent implements OnInit {
 
   enviarMensagem() {
     if (!this.novaMensagem.trim() || !this.etapaAtivaId) return;
-
     const token = localStorage.getItem('access_token');
     if (!token) return;
-
     const payload = JSON.parse(atob(token.split('.')[1]));
-    const authorId = payload.sub;
-
     this.apiService
-      .createComment(this.novaMensagem, this.etapaAtivaId, authorId)
+      .createComment(this.novaMensagem, this.etapaAtivaId, payload.sub)
       .subscribe({
         next: () => {
           this.novaMensagem = '';
           this.carregarComentarios(this.etapaAtivaId!);
-        },
-        error: (err) => {
-          console.error('Erro ao enviar:', err);
         },
       });
   }

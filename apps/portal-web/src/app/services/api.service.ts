@@ -18,14 +18,38 @@ export class ApiService {
     return this.http.get<any>(`${this.apiUrl}/projects/${id}`);
   }
 
+  createProject(project: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/projects`, project);
+  }
+
+  deleteProject(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/projects/${id}`);
+  }
+
   getUsers(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/users`);
+  }
+
+  createUser(user: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/users`, user);
+  }
+
+  deleteUser(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/users/${id}`);
   }
 
   getMilestonesByProject(projectId: string): Observable<any[]> {
     return this.http.get<any[]>(
       `${this.apiUrl}/milestones/project/${projectId}`,
     );
+  }
+
+  createMilestone(milestone: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/milestones`, milestone);
+  }
+
+  deleteMilestone(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/milestones/${id}`);
   }
 
   getCommentsByMilestone(milestoneId: string): Observable<any[]> {
