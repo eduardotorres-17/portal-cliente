@@ -25,6 +25,7 @@ export class ProjectDetailsComponent implements OnInit {
   etapaAtivaId: string | null = null;
   comentariosDaEtapa: any[] = [];
   novaMensagem: string = '';
+  arquivoSelecionado: File | null = null; // 👈 VARIÁVEL NOVA
 
   constructor(
     private route: ActivatedRoute,
@@ -105,16 +106,31 @@ export class ProjectDetailsComponent implements OnInit {
     });
   }
 
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.arquivoSelecionado = file;
+    }
+  }
+
   enviarMensagem() {
     if (!this.novaMensagem.trim() || !this.etapaAtivaId) return;
+
     const token = localStorage.getItem('access_token');
     if (!token) return;
     const payload = JSON.parse(atob(token.split('.')[1]));
+
     this.apiService
-      .createComment(this.novaMensagem, this.etapaAtivaId, payload.sub)
+      .createComment(
+        this.novaMensagem,
+        this.etapaAtivaId,
+        payload.sub,
+        this.arquivoSelecionado || undefined,
+      )
       .subscribe({
         next: () => {
           this.novaMensagem = '';
+          this.arquivoSelecionado = null;
           this.carregarComentarios(this.etapaAtivaId!);
         },
       });

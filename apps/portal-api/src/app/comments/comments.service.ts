@@ -19,15 +19,18 @@ export class CommentsService {
     const milestone = await this.milestonesRepository.findOneBy({
       id: createCommentDto.milestone_id,
     });
+
     if (!milestone) throw new NotFoundException('Etapa não encontrada.');
 
     const author = await this.usersRepository.findOneBy({
       id: createCommentDto.author_id,
     });
+
     if (!author) throw new NotFoundException('Autor não encontrado.');
 
     const newComment = this.commentsRepository.create({
       content: createCommentDto.content,
+      file_url: createCommentDto.file_url,
       milestone: milestone,
       author: author,
     });
@@ -43,14 +46,12 @@ export class CommentsService {
     });
   }
 
-  // 👇 Novo: Busca comentário por ID
   async findOne(id: string): Promise<Comment> {
     const comment = await this.commentsRepository.findOneBy({ id });
     if (!comment) throw new NotFoundException('Comentário não encontrado.');
     return comment;
   }
 
-  // 👇 Novo: Remove o comentário
   async remove(id: string): Promise<Comment> {
     const comment = await this.findOne(id);
     return this.commentsRepository.remove(comment);

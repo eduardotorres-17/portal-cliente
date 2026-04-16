@@ -137,25 +137,102 @@
                   "
                   >{{ msg.author?.name }}</span
                 >
-                <span>—</span>
                 <span>{{ msg.created_at | date: 'HH:mm' }}</span>
+                <span>{{ msg.created_at | date: 'dd/MM' }}</span>
               </div>
               <p class="text-zinc-300 leading-relaxed">{{ msg.content }}</p>
+
+              <div *ngIf="msg.file_url" class="mt-4">
+                <a
+                  [href]="'http://localhost:3000' + msg.file_url"
+                  target="_blank"
+                  class="inline-flex items-center space-x-2 bg-zinc-800 text-lime-400 font-mono text-[10px] uppercase tracking-widest py-2 px-4 border-2 border-zinc-700 hover:border-lime-400 hover:bg-lime-400/10 transition"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                    ></path>
+                  </svg>
+                  <span>Acessar Documento</span>
+                </a>
+              </div>
             </div>
           </div>
-          <div class="flex space-x-4">
-            <input
-              [(ngModel)]="novaMensagem"
-              (keyup.enter)="enviarMensagem()"
-              placeholder="INSERIR LOG..."
-              class="flex-1 bg-zinc-900 border-2 border-zinc-800 p-4 text-lime-400 font-mono focus:outline-none focus:border-fuchsia-600"
-            />
-            <button
-              (click)="enviarMensagem()"
-              class="bg-zinc-100 hover:bg-lime-400 text-zinc-950 font-black uppercase px-8 py-4 transition"
+
+          <div class="flex flex-col space-y-3">
+            <div
+              *ngIf="arquivoSelecionado"
+              class="flex items-center justify-between bg-zinc-900 border-l-4 border-lime-400 p-3 text-xs font-mono text-zinc-300"
             >
-              Enviar
-            </button>
+              <span class="flex items-center"
+                ><svg
+                  class="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                  ></path>
+                </svg>
+                {{ arquivoSelecionado.name }}</span
+              >
+              <button
+                (click)="arquivoSelecionado = null"
+                class="text-red-500 hover:text-red-400 font-bold px-2 uppercase tracking-widest text-[10px]"
+              >
+                Remover
+              </button>
+            </div>
+
+            <div class="flex space-x-4">
+              <label
+                class="bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-lime-400 border-2 border-zinc-700 hover:border-lime-400 cursor-pointer p-4 transition flex items-center justify-center"
+              >
+                <input
+                  type="file"
+                  class="hidden"
+                  (change)="onFileSelected($event)"
+                />
+                <svg
+                  class="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                  ></path>
+                </svg>
+              </label>
+
+              <input
+                [(ngModel)]="novaMensagem"
+                (keyup.enter)="enviarMensagem()"
+                placeholder="INSERIR LOG OU COMENTÁRIO..."
+                class="flex-1 bg-zinc-900 border-2 border-zinc-800 p-4 text-lime-400 font-mono focus:outline-none focus:border-fuchsia-600"
+              />
+              <button
+                (click)="enviarMensagem()"
+                class="bg-zinc-100 hover:bg-lime-400 text-zinc-950 font-black uppercase px-8 py-4 transition shadow-[4px_4px_0_0_rgba(162,28,175,1)]"
+              >
+                Enviar
+              </button>
+            </div>
           </div>
         </div>
       </div>

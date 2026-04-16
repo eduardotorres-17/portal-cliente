@@ -18,6 +18,9 @@ export class Comment {
   @Column('text')
   content: string;
 
+  @Column({ type: 'text', nullable: true })
+  file_url: string;
+
   @ManyToOne(() => Milestone, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'milestone_id' })
   milestone: Milestone;
@@ -26,9 +29,9 @@ export class Comment {
   @JoinColumn({ name: 'author_id' })
   author: User;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updated_at: Date;
 }

@@ -7,15 +7,20 @@ import {
   ParseUUIDPipe,
   Delete,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
   ApiParam,
   ApiBearerAuth,
+  ApiConsumes,
 } from '@nestjs/swagger';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { CommentsService } from './comments.service';
-import { CreateCommentDto } from './dto/create-comment.dto';
 import { AuthGuard } from '../auth/auth.guard';
 
 @ApiTags('Comments')
@@ -27,8 +32,34 @@ export class CommentsController {
 
   @Post()
   @ApiOperation({ summary: 'Adiciona um comentário em uma etapa' })
-  create(@Body() createCommentDto: CreateCommentDto) {
-    return this.commentsService.create(createCommentDto);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+        },
+      }),
+    }),
+  )
+  create(
+    @Body('content') content: string,
+    @Body('milestone_id') milestone_id: string,
+    @Body('author_id') author_id: string,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const file_url = file ? `/uploads/${file.filename}` : undefined;
+
+    return this.commentsService.create({
+      content,
+      milestone_id,
+      author_id,
+      file_url,
+    });
   }
 
   @Get('milestone/:milestoneId')

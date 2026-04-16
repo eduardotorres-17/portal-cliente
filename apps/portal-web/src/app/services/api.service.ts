@@ -62,11 +62,17 @@ export class ApiService {
     content: string,
     milestoneId: string,
     authorId: string,
+    file?: File,
   ): Observable<any> {
-    return this.http.post(`${this.apiUrl}/comments`, {
-      content,
-      milestone_id: milestoneId,
-      author_id: authorId,
-    });
+    const formData = new FormData();
+    formData.append('content', content);
+    formData.append('milestone_id', milestoneId);
+    formData.append('author_id', authorId);
+
+    if (file) {
+      formData.append('file', file);
+    }
+
+    return this.http.post(`${this.apiUrl}/comments`, formData);
   }
 }
